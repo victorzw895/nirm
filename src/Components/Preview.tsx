@@ -1,4 +1,4 @@
-import { Component, createSignal, Show } from 'solid-js';
+import { Component, createSignal } from 'solid-js';
 
 const [selectedAnime, setSelectedAnime] = createSignal<any>(null);
 

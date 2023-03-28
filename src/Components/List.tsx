@@ -1,4 +1,4 @@
-import { Component, onMount, For, Show } from 'solid-js';
+import { Component, For, Show } from 'solid-js';
 import Card from './Card';
 import { setSelectedAnime } from './Preview';
 import { setAnimeList } from '../App';

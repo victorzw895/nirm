@@ -1,5 +1,4 @@
-import { Component, Setter, Show } from 'solid-js';
-import { setSelectedAnime } from './Preview';
+import { Component, Show } from 'solid-js';
 
 interface CardProps {
   japName: string,
