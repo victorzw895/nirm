@@ -7,10 +7,11 @@ import {
   getAnimeList,
   getAnimeWatchedList,
   upsertAnimeWatched,
+  Anime,
 } from './api';
 
-const [animeList, setAnimeList] = createSignal([]);
-const [animeWatchedList, setAnimeWatchedList] = createStore([]);
+const [animeList, setAnimeList] = createSignal<Anime[] | Partial<Anime>[]>([]);
+const [animeWatchedList, setAnimeWatchedList] = createStore<Anime[]>([]);
 
 const App: Component = () => {
   onMount(async () => {
@@ -34,16 +35,21 @@ const App: Component = () => {
 
     let updatedWatchedList = [];
     if (upsertAnime.isWatched) {
-      setSelectedAnime(animeList()[selectedAnime().id])
+      const nextAnimeIndex = animeList().findIndex(anime => anime.id === selectedAnime().id) + 1;
+      if (nextAnimeIndex <= animeList().length) {
+        setSelectedAnime(animeList()[nextAnimeIndex]);
+      }
+
       updatedWatchedList = [...animeWatchedList, upsertAnime].sort((a, b) => a.rank - b.rank)
     }
     else {
-      setSelectedAnime(upsertAnime)
+      setSelectedAnime(null)
       updatedWatchedList = animeWatchedList
         .filter(anime => anime.id !== upsertAnime.id)
         .sort((a, b) => a.rank - b.rank)
     }
 
+    setAnimeList(await getAnimeList())
     setAnimeWatchedList(updatedWatchedList)
   }
 

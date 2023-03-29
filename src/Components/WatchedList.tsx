@@ -1,4 +1,4 @@
-import { useDragDropContext } from "@thisbeyond/solid-dnd";
+import { Droppable, useDragDropContext } from "@thisbeyond/solid-dnd";
 import {
   DragDropProvider,
   DragDropSensors,
@@ -6,13 +6,15 @@ import {
   SortableProvider,
   createSortable,
   closestCenter,
+  Draggable
 } from "@thisbeyond/solid-dnd";
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, Show, JSXElement } from "solid-js";
 import { animeWatchedList, setAnimeWatchedList } from '../App';
 import { setSelectedAnime } from '../Components/Preview';
 import Card from '../Components/Card';
 import {
   upsertAnimeWatched,
+  Anime
 } from '../api';
 
 declare module "solid-js" {
@@ -23,7 +25,7 @@ declare module "solid-js" {
   }
 }
 
-const Sortable = (props) => {
+const Sortable = (props: {item: {id: number}, children: JSXElement}) => {
   const sortable = createSortable(props.item.id);
   const [state] = useDragDropContext();
   return (
@@ -41,20 +43,20 @@ const Sortable = (props) => {
 };
 
 export const SortableWatchedAnimeList = () => {
-  const [activeItem, setActiveItem] = createSignal(null);
+  const [activeItem, setActiveItem] = createSignal<Anime>(null);
   const ids = () => animeWatchedList.map(anime => anime.id);
-  const onDragStart = ({ draggable }) => {
+  const onDragStart = ({ draggable }: { draggable: Draggable}) => {
     const draggedAnime = animeWatchedList.find(anime => anime.id === draggable.id)
     setActiveItem(draggedAnime)
   };
 
-  const onDragOver = ({ draggable, droppable }) => {
+  const onDragOver = ({ draggable, droppable }: { draggable: Draggable, droppable: Droppable }) => {
     if (draggable && droppable) {
       // const currentItems = animeWatchedList;
       // const fromIndex = ids().indexOf(draggable.id);
-      const toIndex = ids().indexOf(droppable.id);
+      const toIndex = ids().indexOf(Number(droppable.id));
 
-      // TODO update all cards ranks as active draggable moves
+      // TODO update all cards ranks as active draggable
       // const updatedItems = currentItems.slice();
       // updatedItems.splice(toIndex, 0, ...updatedItems.splice(fromIndex, 1));
       // const updatedItemRanks = updatedItems.map((anime, index) => ({
@@ -72,11 +74,11 @@ export const SortableWatchedAnimeList = () => {
     }
   }
 
-  const onDragEnd = ({ draggable, droppable }) => {
+  const onDragEnd = ({ draggable, droppable }: { draggable: Draggable, droppable: Droppable }) => {
     if (draggable && droppable) {
       const currentItems = animeWatchedList;
-      const fromIndex = ids().indexOf(draggable.id);
-      const toIndex = ids().indexOf(droppable.id);
+      const fromIndex = ids().indexOf(Number(draggable.id));
+      const toIndex = ids().indexOf(Number(droppable.id));
       if (fromIndex !== toIndex) {
         const updatedItems = currentItems.slice();
         updatedItems.splice(toIndex, 0, ...updatedItems.splice(fromIndex, 1));

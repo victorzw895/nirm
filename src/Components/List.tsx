@@ -5,10 +5,11 @@ import { setAnimeList } from '../App';
 import {
   fetchAnimes,
   upsertAnimeWatched,
+  Anime,
 } from '../api';
 
 interface ListProps {
-  animeList: any[],
+  animeList: Anime[] | Partial<Anime>[],
   watchedList?: boolean
 }
 
@@ -20,7 +21,7 @@ const List: Component<ListProps> = (props) => {
     if (moreAnimes.data.length === 0) return;
 
     const upsertAnimes = (await upsertAnimeWatched(
-      moreAnimes.data.map(anime => ({
+      moreAnimes.data.map((anime: Partial<Anime>) => ({
         id: anime.id,
         attributes: anime.attributes,
         stars: 0,

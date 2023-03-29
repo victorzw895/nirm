@@ -1,6 +1,8 @@
 import { Component, createSignal } from 'solid-js';
+import moment from 'moment';
+import { Anime } from '../api';
 
-const [selectedAnime, setSelectedAnime] = createSignal<any>(null);
+const [selectedAnime, setSelectedAnime] = createSignal<Anime | Partial<Anime> | null>(null);
 
 interface PreviewProps {
   animeWatched: () => void,
@@ -11,35 +13,19 @@ const Preview: Component<PreviewProps> = (props) => {
   return (
     <section class='grid auto-rows-auto content-center col-span-2'>
       <div class='flex items-center mx-1'>
-        <img class='max-h-80 m-2' src={
-          selectedAnime()?.attributes ? 
-            selectedAnime()?.attributes.posterImage.small
-              :
-            selectedAnime()?.poster_small
-          }
+        <img class='max-h-80 m-2' src={selectedAnime()?.attributes.posterImage.small}
         />
         <div class='ml-2'>
-          <p>{
-            selectedAnime()?.attributes ? 
-              selectedAnime()?.attributes.titles.en_jp
-                :
-              selectedAnime()?.title_jap
-          }</p>
-          <p class='text-xs'>{
-            selectedAnime()?.attributes ? 
-              selectedAnime()?.attributes.titles.en
-                :
-              selectedAnime()?.title_en
-          }</p>
+          <p>{selectedAnime()?.attributes.titles.en_jp}</p>
+          <p class='text-xs'>{selectedAnime()?.attributes.titles.en}</p>
+          <p class='text-xs'>Rating {selectedAnime()?.attributes.ageRatingGuide}</p>
+          <p class='text-xs'>Release Date: {moment(selectedAnime()?.attributes.startDate).format('YYYY')}</p>
         </div>
       </div>
       <div class='ml-2'>
         <p>Description</p>
         <p class='text-xs'>{
-          selectedAnime()?.attributes ? 
             selectedAnime()?.attributes.description
-              :
-            selectedAnime()?.description
         }</p>
       </div>
       <div class='ml-2 flex justify-evenly'>

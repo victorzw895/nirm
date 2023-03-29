@@ -1,7 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js'
 
-// Create a single supabase client for interacting with your database
 export const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_KEY)
 
 const fetchAnimes = async ({limit, offset} = {limit: 7, offset: 0}) => {
@@ -9,18 +8,71 @@ const fetchAnimes = async ({limit, offset} = {limit: 7, offset: 0}) => {
     return response.json();
 }
 
+type ImageSizes = 'original' | 'tiny' | 'small' | 'medium' | 'large'
+interface Images extends Record<ImageSizes, string> {
+    meta: {
+        dimensions: Record<ImageSizes, {
+            width: number,
+            height: number
+        }>
+    }
+}
+
+export interface Anime {
+    id: number,
+    attributes: {
+        'createdAt': string,
+        'updatedAt': string,
+        'slug': string,
+        'synopsis': string,
+        'description': string,
+        'coverImageTopOffset': number,
+        'titles': Record<'en' | 'en_jp' | 'ja_jp', string>,
+        'canonicalTitle': string,
+        'abbreviatedTitles': string[],
+        'averageRating': string,
+        'ratingFrequencies': Record<string, string>,
+        'userCount': number,
+        'favoritesCount': number,
+        'startDate': string,
+        'endDate': string,
+        'nextRelease': null,
+        'popularityRank': number,
+        'ratingRank': number,
+        'ageRating': string,
+        'ageRatingGuide': string,
+        'subtype': string,
+        'status': string,
+        'tba': null,
+        'posterImage': Images,
+        'coverImage': Images,
+        'episodeCount': number,
+        'episodeLength': number,
+        'totalLength': number,
+        'youtubeVideoId': string,
+        'showType': string,
+        'nsfw': boolean
+    },
+    rank: number,
+    stars: number,
+    isWatched: boolean
+}
+
+const getAnimes = async () => {
+    return await supabase
+        .from('AnimeList')
+        .select()
+        .order('id', { ascending: true })
+}
 
 const getAnimeList = async () => {
     const env = import.meta.env.VITE_ENV;
 
-    const { data } = await (
+    const { data } : { data: Partial<Anime>[] | Anime[] } = await (
         env !== 'local' ? 
             fetchAnimes()
                 : 
-            supabase
-                .from('AnimeList')
-                .select()
-                .order('id', { ascending: true })
+            getAnimes()
     )
 
     return data;
@@ -33,28 +85,26 @@ const getAnimeWatchedList = async () => {
         .eq('isWatched', true)
         .order('rank', { ascending: true });
 
-    console.log('data', data, error)
-
-    return data;
+    return data as Anime[];
 }
 
-const upsertAnimeWatched = async (anime) => {
+const upsertAnimeWatched = async (anime: Anime | Anime[]) => {
     const { data, error } = await supabase
         .from('AnimeList')
         .upsert(anime)
         .select()
     
-    return data;
+    return data as Anime[];
 }
 
-const updateAnimeWatched = async (anime) => {
+const updateAnimeWatched = async <T extends Anime>(anime: T) => {
     const { data, error } = await supabase
         .from('AnimeList')
         .update(anime)
         .eq('id', anime.id)
         .select()
     
-    return data;
+    return data as T[];
 }
 
 export {
