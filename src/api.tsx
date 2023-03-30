@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 
 export const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_KEY)
 
+// const fetchAnimes = async ({limit, offset, year} = {limit: 7, offset: 0, year: 2000}) => {
 const fetchAnimes = async ({limit, offset} = {limit: 7, offset: 0}) => {
     const response = await fetch(`${import.meta.env.VITE_ANIME_API}?page[limit]=${limit}&page[offset]=${offset}`);
     return response.json();

@@ -9,6 +9,7 @@ import {
   upsertAnimeWatched,
   Anime,
 } from './api';
+import { setFocusAnimeId } from './Components/Card';
 
 const [animeList, setAnimeList] = createSignal<Anime[] | Partial<Anime>[]>([]);
 const [animeWatchedList, setAnimeWatchedList] = createStore<Anime[]>([]);
@@ -35,6 +36,7 @@ const App: Component = () => {
 
     let updatedWatchedList = [];
     if (upsertAnime.isWatched) {
+      setFocusAnimeId(upsertAnime.id)
       const nextAnimeIndex = animeList().findIndex(anime => anime.id === selectedAnime().id) + 1;
       if (nextAnimeIndex <= animeList().length) {
         setSelectedAnime(animeList()[nextAnimeIndex]);
@@ -63,9 +65,11 @@ const App: Component = () => {
             animeWatched={handleAnimeWatched}
             nextAnime={() => {
               const nextAnimeIndex = animeList().findIndex(anime => anime.id === selectedAnime().id) + 1;
-              if (nextAnimeIndex === animeList().length) return
+              if (nextAnimeIndex === animeList().length) return;
 
-              setSelectedAnime(animeList()[nextAnimeIndex]);
+              const nextAnime = animeList()[nextAnimeIndex];
+              setFocusAnimeId(nextAnime.id)
+              setSelectedAnime(nextAnime);
             }}
           />
         </Show>

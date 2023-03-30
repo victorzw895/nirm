@@ -11,7 +11,7 @@ import {
 import { createSignal, For, Show, JSXElement } from "solid-js";
 import { animeWatchedList, setAnimeWatchedList } from '../App';
 import { setSelectedAnime } from '../Components/Preview';
-import Card from '../Components/Card';
+import Card, { setFocusAnimeId } from '../Components/Card';
 import {
   upsertAnimeWatched,
   Anime
@@ -42,8 +42,9 @@ const Sortable = (props: {item: {id: number}, children: JSXElement}) => {
   );
 };
 
+const [activeItem, setActiveItem] = createSignal<Anime>(null);
 export const SortableWatchedAnimeList = () => {
-  const [activeItem, setActiveItem] = createSignal<Anime>(null);
+
   const ids = () => animeWatchedList.map(anime => anime.id);
   const onDragStart = ({ draggable }: { draggable: Draggable}) => {
     const draggedAnime = animeWatchedList.find(anime => anime.id === draggable.id)
@@ -53,8 +54,14 @@ export const SortableWatchedAnimeList = () => {
   const onDragOver = ({ draggable, droppable }: { draggable: Draggable, droppable: Droppable }) => {
     if (draggable && droppable) {
       // const currentItems = animeWatchedList;
-      // const fromIndex = ids().indexOf(draggable.id);
+      // const fromIndex = ids().indexOf(Number(draggable.id));
       const toIndex = ids().indexOf(Number(droppable.id));
+      // if (cardRef) {
+      //   cardRef.scrollIntoView({
+      //     behavior: 'smooth',
+      //     block: 'start',
+      //   })
+      // }
 
       // TODO update all cards ranks as active draggable
       // const updatedItems = currentItems.slice();
@@ -116,6 +123,7 @@ export const SortableWatchedAnimeList = () => {
                 (anime) => 
                 <Sortable item={anime}>
                   <Card
+                    id={anime.id}
                     selectAnime={() => {
                       setSelectedAnime((currentAnime) => {
                         if (!!currentAnime && currentAnime.id === anime.id) return null;
@@ -139,6 +147,7 @@ export const SortableWatchedAnimeList = () => {
         <div class="sortable">
           <Show when={!!activeItem()}>
             <Card
+              id={activeItem().id}
               selectAnime={() => {}}
               japName={activeItem().attributes.titles.en_jp} 
               engName={activeItem().attributes.titles.en}
@@ -152,3 +161,5 @@ export const SortableWatchedAnimeList = () => {
     </DragDropProvider>
   );
 };
+
+export {activeItem}
