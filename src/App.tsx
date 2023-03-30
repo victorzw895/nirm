@@ -6,6 +6,7 @@ import { SortableWatchedAnimeList } from './Components/WatchedList';
 import {
   getAnimeList,
   getAnimeWatchedList,
+  insertAnime,
   upsertAnimeWatched,
   Anime,
 } from './api';
@@ -18,7 +19,7 @@ const App: Component = () => {
   onMount(async () => {
     const animeList = await getAnimeList()
     setAnimeList(animeList)
-
+    
     const watchedAnimeList = await getAnimeWatchedList()
     setAnimeWatchedList(watchedAnimeList)
   })
@@ -27,9 +28,10 @@ const App: Component = () => {
     const anime = {
       id: selectedAnime().id,
       attributes: selectedAnime().attributes,
-      rank: animeWatchedList.length + 1,
+      rank: selectedAnime().isWatched ? null : animeWatchedList.length + 1,
       stars: 0,
-      isWatched: !selectedAnime().isWatched
+      isWatched: !selectedAnime().isWatched,
+      seasonYear: selectedAnime().seasonYear,
     }
 
     const upsertAnime = (await upsertAnimeWatched(anime))[0]

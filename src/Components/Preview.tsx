@@ -13,7 +13,7 @@ const Preview: Component<PreviewProps> = (props) => {
   return (
     <section class='grid auto-rows-auto content-center col-span-2'>
       <div class='flex items-center mx-1'>
-        <img class='max-h-80 m-2' src={selectedAnime()?.attributes.posterImage.small}
+        <img class='max-h-80 m-2' src={selectedAnime()?.attributes.posterImage?.small}
         />
         <div class='ml-2'>
           <p>{selectedAnime()?.attributes.titles.en_jp}</p>

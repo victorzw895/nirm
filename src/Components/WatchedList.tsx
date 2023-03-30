@@ -133,7 +133,7 @@ export const SortableWatchedAnimeList = () => {
                     }}
                     japName={anime.attributes.titles.en_jp} 
                     engName={anime.attributes.titles.en}
-                    poster={anime.attributes.posterImage.tiny}
+                    poster={anime.attributes.posterImage?.tiny}
                     rank={anime.rank}
                     stars={anime.stars}
                   />
@@ -151,7 +151,7 @@ export const SortableWatchedAnimeList = () => {
               selectAnime={() => {}}
               japName={activeItem().attributes.titles.en_jp} 
               engName={activeItem().attributes.titles.en}
-              poster={activeItem().attributes.posterImage.tiny}
+              poster={activeItem().attributes.posterImage?.tiny}
               rank={activeItem().rank}
               stars={activeItem().stars}
             />

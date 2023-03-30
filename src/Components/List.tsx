@@ -1,4 +1,4 @@
-import { Component, For, createSignal, Switch, Match } from 'solid-js';
+import { Component, For, createSignal, Switch, Match, onMount } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 import Card from './Card';
 import { setSelectedAnime } from './Preview';
@@ -7,7 +7,9 @@ import {
   fetchAnimes,
   upsertAnimeWatched,
   Anime,
+  getSeasonYears,
 } from '../api';
+import moment from 'moment';
 
 interface ListProps {
   animeList: Anime[] | Partial<Anime>[],
@@ -15,6 +17,11 @@ interface ListProps {
 
 const List: Component<ListProps> = (props) => {
   const [showAll, setShowAll] = createSignal(false);
+  const [seasonYears, setSeasonYears] = createSignal([]);
+
+  onMount(async () => {
+    setSeasonYears(await getSeasonYears())
+  })
 
   const getList = () => {
     if (showAll()) {
@@ -27,8 +34,11 @@ const List: Component<ListProps> = (props) => {
 
   const loadMore = async () => {
     const limit = 7;
-    const moreAnimes = await fetchAnimes({limit, offset: props.animeList.length + limit});
+    const [latestYear] = seasonYears().slice(-1)
+    const offset = props.animeList.filter(anime => anime.seasonYear === latestYear).length;
+    const moreAnimes = await fetchAnimes({limit, offset, year: latestYear});
 
+    console.log('moreAnimes', moreAnimes)
     if (moreAnimes.data.length === 0) return;
 
     const upsertAnimes = (await upsertAnimeWatched(
@@ -36,11 +46,17 @@ const List: Component<ListProps> = (props) => {
         id: anime.id,
         attributes: anime.attributes,
         stars: 0,
-        isWatched: false
+        isWatched: false,
+        seasonYear: latestYear
       }))
     ))
 
     setAnimeList((animeList) => ([...animeList, ...upsertAnimes]))
+
+    if (limit + offset <= moreAnimes.meta.count) return;
+    if (latestYear === moment().year()) return;
+
+    setSeasonYears((years) => [...years, latestYear + 1])
   }
 
   return (
@@ -51,25 +67,30 @@ const List: Component<ListProps> = (props) => {
       </div>
       <div class='space-y-1 max-h-[37rem] overflow-y-scroll'>
         {/* TODO filter all / unwatched */}
-        <Dynamic component={() =>
-          <For each={getList()}> 
+        <Dynamic component={() => 
+          <For each={seasonYears()}> 
             {
-              (anime) => 
-              <Card
-                id={anime.id}
-                selectAnime={() => {
-                  setSelectedAnime((currentAnime) => {
-                    if (!!currentAnime && currentAnime.id === anime.id) return null;
+              (year) => 
+              <For each={getList().filter(anime => anime.seasonYear === year)}> 
+                {
+                  (anime) => 
+                  <Card
+                    id={anime.id}
+                    selectAnime={() => {
+                      setSelectedAnime((currentAnime) => {
+                        if (!!currentAnime && currentAnime.id === anime.id) return null;
 
-                    return anime;
-                  })
-                }}
-                japName={anime.attributes.titles.en_jp} 
-                engName={anime.attributes.titles.en}
-                poster={anime.attributes.posterImage.tiny}
-                rank={null}
-                stars={null}
-              />
+                        return anime;
+                      })
+                    }}
+                    japName={anime.attributes.titles.en_jp} 
+                    engName={anime.attributes.titles.en}
+                    poster={anime.attributes.posterImage?.tiny}
+                    rank={null}
+                    stars={null}
+                  />
+                }
+              </For>
             }
           </For>
         } />
