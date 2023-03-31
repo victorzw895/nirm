@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 
 export const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_KEY)
 
-const fetchAnimes = async ({limit, offset, year} = {limit: 7, offset: 0, year: 2000}) => {
+const fetchAnimes = async ({limit, offset, year} = {limit: 20, offset: 0, year: 2000}) => {
     const response = await fetch(`${import.meta.env.VITE_ANIME_API}?page[limit]=${limit}&page[offset]=${offset}&filter[season_year]=${year}&sort=createdAt`);
     return response.json();
 }
@@ -70,7 +70,8 @@ const getAnimes = async () => {
     return await supabase
         .from('AnimeList')
         .select()
-        // .order('id', { ascending: true })
+        .order('seasonYear', { ascending: true })
+        .order('id', { ascending: true })
 }
 
 const getAnimeList = async () => {

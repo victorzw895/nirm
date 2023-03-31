@@ -60,7 +60,7 @@ const App: Component = () => {
   return (
     <>
       <p class="text-2xl text-green-700 text-center py-10">App</p>
-      <main class={`grid ${!!selectedAnime() ? 'grid-cols-4' : 'grid-cols-2'} gap-2 items-start`}>
+      <main class={`grid ${!!selectedAnime() ? 'grid-cols-4' : 'grid-cols-2'} gap-2 items-start h-full`}>
         <List animeList={animeList()} />
         <Show when={!!selectedAnime()}>
           <Preview

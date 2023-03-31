@@ -18,6 +18,7 @@ interface ListProps {
 const List: Component<ListProps> = (props) => {
   const [showAll, setShowAll] = createSignal(false);
   const [seasonYears, setSeasonYears] = createSignal([]);
+  const latestYear = () => seasonYears().slice(-1)[0]
 
   onMount(async () => {
     setSeasonYears(await getSeasonYears())
@@ -33,12 +34,10 @@ const List: Component<ListProps> = (props) => {
   }
 
   const loadMore = async () => {
-    const limit = 7;
-    const [latestYear] = seasonYears().slice(-1)
-    const offset = props.animeList.filter(anime => anime.seasonYear === latestYear).length;
-    const moreAnimes = await fetchAnimes({limit, offset, year: latestYear});
+    const limit = 20;
+    const offset = props.animeList.filter(anime => anime.seasonYear === latestYear()).length;
+    const moreAnimes = await fetchAnimes({limit, offset, year: latestYear()});
 
-    console.log('moreAnimes', moreAnimes)
     if (moreAnimes.data.length === 0) return;
 
     const upsertAnimes = (await upsertAnimeWatched(
@@ -47,16 +46,16 @@ const List: Component<ListProps> = (props) => {
         attributes: anime.attributes,
         stars: 0,
         isWatched: false,
-        seasonYear: latestYear
+        seasonYear: latestYear()
       }))
     ))
 
     setAnimeList((animeList) => ([...animeList, ...upsertAnimes]))
 
     if (limit + offset <= moreAnimes.meta.count) return;
-    if (latestYear === moment().year()) return;
+    if (latestYear() === moment().year()) return;
 
-    setSeasonYears((years) => [...years, latestYear + 1])
+    setSeasonYears((years) => [...years, latestYear() + 1])
   }
 
   return (
@@ -66,31 +65,38 @@ const List: Component<ListProps> = (props) => {
         <button onClick={() => setShowAll(false)}>Unwatched</button>
       </div>
       <div class='space-y-1 max-h-[37rem] overflow-y-scroll'>
-        {/* TODO filter all / unwatched */}
         <Dynamic component={() => 
           <For each={seasonYears()}> 
             {
               (year) => 
-              <For each={getList().filter(anime => anime.seasonYear === year)}> 
-                {
-                  (anime) => 
-                  <Card
-                    id={anime.id}
-                    selectAnime={() => {
-                      setSelectedAnime((currentAnime) => {
-                        if (!!currentAnime && currentAnime.id === anime.id) return null;
+              <div class={`collapse collapse-arrow border border-base-300 bg-base-100 rounded-box`}>
+                <input type="checkbox" /> 
+                <div class="collapse-title text-xl font-medium">
+                  {year}
+                </div>
+                <div class="collapse-content"> 
+                  <For each={getList().filter(anime => anime.seasonYear === year)}> 
+                    {
+                      (anime) => 
+                      <Card
+                        id={anime.id}
+                        selectAnime={() => {
+                          setSelectedAnime((currentAnime) => {
+                            if (!!currentAnime && currentAnime.id === anime.id) return null;
 
-                        return anime;
-                      })
-                    }}
-                    japName={anime.attributes.titles.en_jp} 
-                    engName={anime.attributes.titles.en}
-                    poster={anime.attributes.posterImage?.tiny}
-                    rank={null}
-                    stars={null}
-                  />
-                }
-              </For>
+                            return anime;
+                          })
+                        }}
+                        japName={anime.attributes.titles.en_jp} 
+                        engName={anime.attributes.titles.en}
+                        poster={anime.attributes.posterImage?.tiny}
+                        rank={null}
+                        stars={null}
+                      />
+                    }
+                  </For>
+                </div>
+              </div>
             }
           </For>
         } />

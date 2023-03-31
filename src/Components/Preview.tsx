@@ -11,7 +11,7 @@ interface PreviewProps {
 
 const Preview: Component<PreviewProps> = (props) => {
   return (
-    <section class='grid auto-rows-auto content-center col-span-2'>
+    <section class='grid auto-rows-auto content-center col-span-2 self-center'>
       <div class='flex items-center mx-1'>
         <img class='max-h-80 m-2' src={selectedAnime()?.attributes.posterImage?.small}
         />
