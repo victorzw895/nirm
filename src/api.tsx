@@ -63,37 +63,61 @@ const getSeasonYears = async () => {
         .rpc('getseasonyears')
 
         console.log(data)
-    return data;
+    return data as number[];
 }
 
-const getAnimes = async () => {
-    return await supabase
+export type AnimesByYear = Record<string, Anime[]>
+
+const getAnimesByYear = async (year: number) => {
+    const { data, error } = await supabase
         .from('AnimeList')
         .select()
-        .order('seasonYear', { ascending: true })
+        .eq('seasonYear', year)
         .order('id', { ascending: true })
+    
+    return data as Anime[];
+}
+
+const getAllAnimes = async () => {
+    const dbSeasonYears = await getSeasonYears()
+    const animes = await Promise.all(dbSeasonYears.map(async (year) => await getAnimesByYear(year)))
+
+    const animesByYear = dbSeasonYears.reduce((acc, year, index) => ({
+        ...acc,
+        [year.toString()]: animes[index]
+    }), {})
+
+    console.log(animesByYear);
+
+    return animesByYear;
 }
 
 const getAnimeList = async () => {
-    let data: Partial<Anime>[] | Anime[];
-    const dbAnimes = await getAnimes();
+    let data: AnimesByYear;
+    const dbAnimes = await getAllAnimes();
 
-    if (dbAnimes.data && dbAnimes.data.length) {
-        data = dbAnimes.data
+    if (dbAnimes && Object.keys(dbAnimes).length) {
+        data = dbAnimes
     }
     else {
-        data = (await fetchAnimes()).data.map((anime: Partial<Anime>) => ({
-            id: anime.id,
-            attributes: anime.attributes,
-            stars: 0,
-            isWatched: false,
-            seasonYear: 2000,
-        }));
+        const { data: fetchInitialAnimesData }: {data: Partial<Anime>[]} = await fetchAnimes()
+        data = {
+            '2000': fetchInitialAnimesData.map(anime => 
+                ({
+                    id: anime.id,
+                    attributes: anime.attributes,
+                    rank: null,
+                    stars: 0,
+                    isWatched: false,
+                    seasonYear: 2000,
+                }) as Anime
+            )
+        }
+        
+        insertAnime(data['2000'])
+    };
 
-        insertAnime(data as Anime[])
-    }
-
-    return data as Anime[];
+    return data;
 }
 
 const getAnimeWatchedList = async () => {

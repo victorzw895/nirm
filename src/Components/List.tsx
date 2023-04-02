@@ -8,11 +8,12 @@ import {
   upsertAnimeWatched,
   Anime,
   getSeasonYears,
+  AnimesByYear,
 } from '../api';
 import moment from 'moment';
 
 interface ListProps {
-  animeList: Anime[] | Partial<Anime>[],
+  animeList: AnimesByYear,
 }
 
 const List: Component<ListProps> = (props) => {
@@ -21,36 +22,49 @@ const List: Component<ListProps> = (props) => {
   const latestYear = () => seasonYears().slice(-1)[0]
 
   onMount(async () => {
-    setSeasonYears(await getSeasonYears())
+    const seasonYears = await getSeasonYears()
+    setSeasonYears(seasonYears)
   })
 
-  const getList = () => {
+  const getList = (year: number) => {
     if (showAll()) {
-      return props.animeList
+      return props.animeList[year.toString()] || []
     }
     else {
-      return props.animeList.filter(anime => !anime.isWatched)
+      return (props.animeList[year.toString()] || [] ).filter(anime => !anime.isWatched)
     }
   }
 
+
   const loadMore = async () => {
     const limit = 20;
-    const offset = props.animeList.filter(anime => anime.seasonYear === latestYear()).length;
+    const latestYearAnimeList = props.animeList[latestYear().toString()];
+    const offset = latestYearAnimeList && latestYearAnimeList.length ?
+      latestYearAnimeList.filter(anime => anime.seasonYear === latestYear()).length
+      : 0;
     const moreAnimes = await fetchAnimes({limit, offset, year: latestYear()});
 
-    if (moreAnimes.data.length === 0) return;
-
-    const upsertAnimes = (await upsertAnimeWatched(
-      moreAnimes.data.map((anime: Partial<Anime>) => ({
-        id: anime.id,
-        attributes: anime.attributes,
-        stars: 0,
-        isWatched: false,
-        seasonYear: latestYear()
-      }))
-    ))
-
-    setAnimeList((animeList) => ([...animeList, ...upsertAnimes]))
+    if (moreAnimes.data.length) {
+      const upsertAnimes = (await upsertAnimeWatched(
+        moreAnimes.data.map((anime: Partial<Anime>) => ({
+          id: anime.id,
+          attributes: anime.attributes,
+          stars: 0,
+          isWatched: false,
+          seasonYear: latestYear()
+        }))
+      ))
+  
+      if (latestYearAnimeList && latestYearAnimeList.length) {
+        setAnimeList(latestYear().toString(), (animeList) => ([...animeList, ...upsertAnimes]))
+      }
+      else {
+        setAnimeList((animeByYears) => ({
+          ...animeByYears,
+          [latestYear().toString()]: upsertAnimes
+        }))
+      }
+    }
 
     if (limit + offset <= moreAnimes.meta.count) return;
     if (latestYear() === moment().year()) return;
@@ -75,24 +89,24 @@ const List: Component<ListProps> = (props) => {
                   {year}
                 </div>
                 <div class="collapse-content"> 
-                  <For each={getList().filter(anime => anime.seasonYear === year)}> 
+                  <For each={getList(year)}> 
                     {
                       (anime) => 
                       <Card
-                        id={anime.id}
-                        selectAnime={() => {
-                          setSelectedAnime((currentAnime) => {
-                            if (!!currentAnime && currentAnime.id === anime.id) return null;
+                          id={anime.id}
+                          selectAnime={() => {
+                            setSelectedAnime((currentAnime) => {
+                              if (!!currentAnime && currentAnime.id === anime.id) return null;
 
-                            return anime;
-                          })
-                        }}
-                        japName={anime.attributes.titles.en_jp} 
-                        engName={anime.attributes.titles.en}
-                        poster={anime.attributes.posterImage?.tiny}
-                        rank={null}
-                        stars={null}
-                      />
+                              return anime;
+                            })
+                          }}
+                          japName={anime.attributes.titles.en_jp} 
+                          engName={anime.attributes.titles.en}
+                          poster={anime.attributes.posterImage?.tiny}
+                          rank={null}
+                          stars={null}
+                        />
                     }
                   </For>
                 </div>
