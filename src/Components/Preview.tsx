@@ -9,9 +9,21 @@ interface PreviewProps {
   nextAnime: () => void,
 }
 
+// const handleNextAnime = () => {
+
+// }
+
+// const handlePreviousAnime = () => {
+
+// }
+
+// const handleWatchedAnime = () => {
+
+// }
+
 const Preview: Component<PreviewProps> = (props) => {
   return (
-    <section class='grid auto-rows-auto content-center col-span-2 self-center'>
+    <section class='col-span-2 self-center'>
       <div class='flex items-center mx-1'>
         <img class='max-h-80 m-2' src={selectedAnime()?.attributes.posterImage?.small}
         />
@@ -22,21 +34,19 @@ const Preview: Component<PreviewProps> = (props) => {
           <p class='text-xs'>Release Date: {moment(selectedAnime()?.attributes.startDate).format('YYYY')}</p>
         </div>
       </div>
-      <div class='ml-2'>
+      <div class='ml-2 min-h-[10rem]'>
         <p>Description</p>
-        <p class='text-xs'>{
-            selectedAnime()?.attributes.description
-        }</p>
+        <p class='text-xs line-clamp-8'>{selectedAnime()?.attributes.description}</p>
       </div>
       <div class='ml-2 flex justify-evenly'>
       <button
-        class={`border rounded my-3 p-2 ${selectedAnime()?.isWatched ? 'bg-gray-400 border-gray-400' : 'border-neutral-800'}`}
+        class={`rounded my-3 p-2 ${selectedAnime()?.isWatched ? 'bg-light text-darkest' : 'bg-dark'}`}
         onClick={props.animeWatched}
       >
         Watched
       </button>
       <button
-        class={`border rounded my-3 p-2 border-neutral-800`}
+        class={`rounded my-3 p-2 bg-dark`}
         onClick={props.nextAnime}
       >
         Next

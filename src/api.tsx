@@ -4,7 +4,7 @@ export const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.m
 
 const fetchAnimes = async ({limit, offset, year} = {limit: 20, offset: 0, year: 2000}) => {
     const response = await fetch(`${import.meta.env.VITE_ANIME_API}?page[limit]=${limit}&page[offset]=${offset}&filter[season_year]=${year}&sort=createdAt`);
-    return response.json();
+    return await response.json();
 }
 
 type ImageSizes = 'original' | 'tiny' | 'small' | 'medium' | 'large'
@@ -55,21 +55,21 @@ export interface Anime {
     rank: number | null,
     stars: number,
     isWatched: boolean,
-    seasonYear: number
+    seasonYear: number,
+    watchlist: boolean,
 }
 
 const getSeasonYears = async () => {
-    let { data, error } = await supabase
+    let { data }: { data: number[]} = await supabase
         .rpc('getseasonyears')
 
-        console.log(data)
-    return data as number[];
+    return data;
 }
 
 export type AnimesByYear = Record<string, Anime[]>
 
 const getAnimesByYear = async (year: number) => {
-    const { data, error } = await supabase
+    const { data } = await supabase
         .from('AnimeList')
         .select()
         .eq('seasonYear', year)
@@ -82,12 +82,10 @@ const getAllAnimes = async () => {
     const dbSeasonYears = await getSeasonYears()
     const animes = await Promise.all(dbSeasonYears.map(async (year) => await getAnimesByYear(year)))
 
-    const animesByYear = dbSeasonYears.reduce((acc, year, index) => ({
+    const animesByYear: {[x: string]: Anime[]} = dbSeasonYears.reduce((acc, year, index) => ({
         ...acc,
         [year.toString()]: animes[index]
     }), {})
-
-    console.log(animesByYear);
 
     return animesByYear;
 }
@@ -101,6 +99,7 @@ const getAnimeList = async () => {
     }
     else {
         const { data: fetchInitialAnimesData }: {data: Partial<Anime>[]} = await fetchAnimes()
+
         data = {
             '2000': fetchInitialAnimesData.map(anime => 
                 ({
@@ -120,11 +119,21 @@ const getAnimeList = async () => {
     return data;
 }
 
-const getAnimeWatchedList = async () => {
-    const { data, error } = await supabase
+const getAnimeRankedList = async () => {
+    const { data } = await supabase
         .from('AnimeList')
         .select()
         .eq('isWatched', true)
+        .order('rank', { ascending: true });
+
+    return data as Anime[];
+}
+
+const getAnimeWatchList = async () => {
+    const { data } = await supabase
+        .from('AnimeList')
+        .select()
+        .eq('watchlist', true)
         .order('rank', { ascending: true });
 
     return data as Anime[];
@@ -137,29 +146,29 @@ const insertAnime = async (anime: Anime[]) => {
 }
 
 const upsertAnimeWatched = async (anime: Anime | Anime[]) => {
-    const { data, error } = await supabase
+    const { data }: {data: Anime[]} = await supabase
         .from('AnimeList')
         .upsert(anime)
         .select()
     
-    return data as Anime[];
+    return data;
 }
 
-const updateAnimeWatched = async <T extends Anime>(anime: T) => {
-    const { data, error } = await supabase
+const updateAnimeWatched = async (anime: Anime) => {
+    const { data }: {data: Anime} = await supabase
         .from('AnimeList')
         .update(anime)
         .eq('id', anime.id)
         .select()
         .single()
     
-    return data as T;
+    return data;
 }
 
 export {
     fetchAnimes,
     getAnimeList,
-    getAnimeWatchedList,
+    getAnimeRankedList,
     getSeasonYears,
     insertAnime,
     upsertAnimeWatched,

@@ -26,11 +26,11 @@ const Card: Component<CardProps> = (props) => {
   })
 
   return (
-    <div ref={cardRef} class='flex border border-neutral-800 items-center rounded mx-1 bg-gray-50' onClick={props.selectAnime}>
+    <div ref={cardRef} class='flex items-center bg-dark' onClick={props.selectAnime}>
       <img class='max-h-16 m-2 flex-grow-0' src={props.poster}/>
-      <div class='ml-2'>
-        <p>{props.japName}</p>
-        <p class='text-xs'>{props.engName}</p>
+      <div class='mx-2 overflow-hidden'>
+        <p class='truncate'>{props.japName}</p>
+        <p class='text-xs truncate'>{props.engName}</p>
       </div>
       <Show when={props.rank}>
         <div class='ml-auto mr-3 flex-grow-0'>
