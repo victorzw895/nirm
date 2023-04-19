@@ -1,0 +1,32 @@
+// Vitest Snapshot v1
+
+exports[`<Card /> > renders Card 1`] = `
+<div>
+  <div
+    class="flex items-center bg-dark"
+    data-testid="card"
+  >
+    <img
+      class="max-h-16 m-2 flex-grow-0"
+      src="poster-url"
+    />
+    <div
+      class="mx-2 overflow-hidden"
+    >
+      <p
+        class="truncate"
+        data-testid="jap-name"
+      >
+        jap-name-text
+      </p>
+      <p
+        class="text-xs truncate"
+        data-testid="eng-name"
+      >
+        eng-name-text
+      </p>
+    </div>
+    
+  </div>
+</div>
+`;

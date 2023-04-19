@@ -1,0 +1,73 @@
+// Vitest Snapshot v1
+
+exports[`<Preview /> > renders Preview 1`] = `
+<div>
+  <section
+    class="col-span-2 self-center"
+  >
+    <div
+      class="flex items-center mx-1"
+    >
+      <img
+        class="max-h-80 m-2"
+        data-testid="poster"
+        src="small-image-source-url"
+      />
+      <div
+        class="ml-2"
+        data-testid="text-content"
+      >
+        <p>
+          en jap title
+        </p>
+        <p
+          class="text-xs"
+        >
+          en title
+        </p>
+        <p
+          class="text-xs"
+        >
+          Rating 
+          age rating guide
+        </p>
+        <p
+          class="text-xs"
+        >
+          Release Date: 
+          2020
+        </p>
+      </div>
+    </div>
+    <div
+      class="ml-2 min-h-[10rem]"
+    >
+      <p>
+        Description
+      </p>
+      <p
+        class="text-xs line-clamp-8"
+        data-testid="description"
+      >
+        description text
+      </p>
+    </div>
+    <div
+      class="ml-2 flex justify-evenly"
+    >
+      <button
+        class="rounded my-3 p-2 bg-light text-darkest"
+        data-testid="watched-button"
+      >
+        Watched
+      </button>
+      <button
+        class="rounded my-3 p-2 bg-dark"
+        data-testid="next-button"
+      >
+        Next
+      </button>
+    </div>
+  </section>
+</div>
+`;

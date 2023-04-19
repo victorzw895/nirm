@@ -1,5 +1,4 @@
 import { Component, Show, createEffect, createSignal } from 'solid-js';
-
 interface CardProps {
   id: number,
   japName: string,
@@ -26,16 +25,16 @@ const Card: Component<CardProps> = (props) => {
   })
 
   return (
-    <div ref={cardRef} class='flex items-center bg-dark' onClick={props.selectAnime}>
+    <div ref={cardRef} data-testid='card' class='flex items-center bg-dark' onClick={props.selectAnime}>
       <img class='max-h-16 m-2 flex-grow-0' src={props.poster}/>
       <div class='mx-2 overflow-hidden'>
-        <p class='truncate'>{props.japName}</p>
-        <p class='text-xs truncate'>{props.engName}</p>
+        <p data-testid='jap-name' class='truncate'>{props.japName}</p>
+        <p data-testid='eng-name' class='text-xs truncate'>{props.engName}</p>
       </div>
       <Show when={props.rank}>
         <div class='ml-auto mr-3 flex-grow-0'>
-          <p class='text-3xl'>{props.rank}</p>
-          <p class='text-xs'>{props.stars ? props.stars : 0}</p>
+          <p data-testid='rank' class='text-3xl'>{props.rank}</p>
+          <p data-testid='stars' class='text-xs'>{props.stars ? props.stars : 0}</p>
         </div>
       </Show>
     </div>
