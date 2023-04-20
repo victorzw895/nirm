@@ -53,7 +53,7 @@ const WatchedList = (props: SortableListProps) => {
 
 
 const SortableWatchedList = () => {
-  const AnimeSortableList = withSortableList(WatchedList, animeRankedList, setAnimeRankedList)
+  const AnimeSortableList = withSortableList<Anime>(WatchedList, animeRankedList, setAnimeRankedList)
 
   return (
     <AnimeSortableList />

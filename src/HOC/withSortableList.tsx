@@ -41,7 +41,6 @@ const Sortable: ParentComponent<SortableProps> = (props) => {
 
 interface SortableItem {
   id: number,
-  [key: string]: any;
 }
 
 export interface DraggableItemProps<T> {
@@ -49,24 +48,25 @@ export interface DraggableItemProps<T> {
   overlay?: boolean
 }
 
-export interface SortableListProps {
-  draggableContainer: (SortableItem: Component<DraggableItemProps<any>>) => JSXElement
+export interface SortableListProps<T> {
+  draggableContainer: (SortableItem: Component<DraggableItemProps<T>>) => JSXElement
   updatedValues: any[],
 }
 
-const [activeItem, setActiveItem] = createSignal<SortableItem>(null);
 
 const withSortableList = <
-  TComponent extends SortableListProps,
-  TList extends SortableItem,
+  TData extends SortableItem,
 >(
-  SortableComponent: Component<TComponent>,
-  sortableList: TList[],
-  setSortableList: SetStoreFunction<TList[]>,
+  SortableComponent: Component<SortableListProps<TData>>,
+  sortableList: TData[],
+  setSortableList: SetStoreFunction<TData[]>,
 ) => {
-  return (props: Omit<TComponent, keyof SortableListProps>) => {
-    const [updatedValues, setUpdatedValues] = createSignal<TList[]>([]);
+  return (props: Omit<SortableListProps<TData>, keyof SortableListProps<TData>>) => {
+    const [activeItem, setActiveItem] = createSignal<TData>(null);
+    const [updatedValues, setUpdatedValues] = createSignal<TData[]>([]);
+
     const ids = () => sortableList.map(item => item.id);
+
     const onDragStart = ({ draggable }: { draggable: Draggable}) => {
       const draggedItem = sortableList.find(item => item.id === draggable.id)
       setActiveItem((_) => draggedItem)
@@ -130,7 +130,7 @@ const withSortableList = <
   
     return (
       <SortableComponent 
-        {...(props as TComponent)}
+        {...(props as SortableListProps<TData>)}
         updatedValues={updatedValues()}
         draggableContainer={
           (SortableItem) => (
