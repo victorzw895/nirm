@@ -50,7 +50,7 @@ export interface Anime {
         'totalLength': number,
         'youtubeVideoId': string,
         'showType': string,
-        'nsfw': boolean
+        'nsfw': boolean,
     },
     rank: number | null,
     stars: number,

@@ -2,7 +2,7 @@ import { Component, onMount, createSignal, Show, createEffect } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import List from './Components/List';
 import Preview, { selectedAnime, setSelectedAnime } from './Components/Preview';
-import { SortableWatchedAnimeList } from './Components/WatchedList';
+import SortableWatchedAnimeList from './Components/WatchedList';
 import {
   getAnimeList,
   getAnimeRankedList,
