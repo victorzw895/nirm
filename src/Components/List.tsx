@@ -8,7 +8,7 @@ import {
 } from '../api';
 import useSeasons from '../Hooks/useSeasons';
 
-interface ListProps {
+export interface ListProps {
   animeList: AnimesByYear,
 }
 

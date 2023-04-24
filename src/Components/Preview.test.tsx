@@ -1,8 +1,8 @@
 import { fireEvent, render } from "@solidjs/testing-library";
-import Preview, {setSelectedAnime} from "./Preview";
+import Preview, { setSelectedAnime, PreviewProps } from "./Preview";
 import { Anime } from '../api';
 
-const previewProps = {
+const previewProps: PreviewProps = {
   animeWatched: () => {},
   nextAnime: () => {},
 };

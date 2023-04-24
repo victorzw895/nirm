@@ -20,7 +20,7 @@ interface SortableProps {
 }
 
 const Sortable: ParentComponent<SortableProps> = (props) => {
-  const sortable = createSortable(props.item.id);
+  const sortable = createSortable(props.item.id, props.item);
   const [state] = useDragDropContext();
   return (
     <div

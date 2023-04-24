@@ -4,7 +4,7 @@ import { Anime } from '../api';
 
 const [selectedAnime, setSelectedAnime] = createSignal<Anime | Partial<Anime> | null>(null);
 
-interface PreviewProps {
+export interface PreviewProps {
   animeWatched: () => void,
   nextAnime: () => void,
 }

@@ -1,7 +1,7 @@
 import { fireEvent, render } from "@solidjs/testing-library";
-import Card from "./Card";
+import Card, { CardProps } from "./Card";
 
-const cardProps = {
+const cardProps: CardProps = {
   id: 0,
   selectAnime: () => {},
   japName: 'jap-name-text',

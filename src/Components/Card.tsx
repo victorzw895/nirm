@@ -1,5 +1,5 @@
 import { Component, Show, createEffect, createSignal } from 'solid-js';
-interface CardProps {
+export interface CardProps {
   id: number,
   japName: string,
   engName: string,

@@ -36,9 +36,9 @@ const useSeasons = (animeList: AnimesByYear) => {
           seasonYear: latestYear()
         }))
       ))
-  
+
       if (latestYearAnimeList && latestYearAnimeList.length) {
-        setAnimeList(latestYear().toString(), (animeList) => ([...animeList, ...upsertAnimes]))
+        setAnimeList(latestYear().toString(), (currentAnimeList) => ([...currentAnimeList, ...upsertAnimes]))
       }
       else {
         setAnimeList((animeByYears) => ({
