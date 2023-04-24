@@ -1,6 +1,5 @@
 import { Droppable, useDragDropContext } from "@thisbeyond/solid-dnd";
 import { Dynamic } from 'solid-js/web';
-import { createStore } from 'solid-js/store';
 import {
   DragDropProvider,
   DragDropSensors,
@@ -10,10 +9,8 @@ import {
   closestCenter,
   Draggable,
 } from "@thisbeyond/solid-dnd";
-import { For, Show, JSXElement, Component, createSignal, ParentComponent, JSX } from "solid-js";
+import { For, Show, JSXElement, Component, createSignal, ParentComponent } from "solid-js";
 import { SetStoreFunction } from "solid-js/store";
-import { setSelectedAnime } from '../Components/Preview';
-import { upsertAnimeWatched, Anime } from '../api';
 
 interface SortableProps {
   item: {

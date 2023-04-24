@@ -5,7 +5,7 @@ import {
 import Card from '../Components/Card';
 import withSortableList, { SortableListProps, DraggableItemProps } from '../HOC/withSortableList';
 import { setSelectedAnime } from '../Components/Preview';
-import { JSXElement, Component, createEffect } from "solid-js";
+import { createEffect } from "solid-js";
 import { upsertAnimeWatched, Anime } from '../api';
 
 const SortableCard = (props: DraggableItemProps<Anime>) => {
@@ -31,7 +31,7 @@ const SortableCard = (props: DraggableItemProps<Anime>) => {
   )
 }
 
-const WatchedList = (props: SortableListProps) => {
+const WatchedList = (props: SortableListProps<Anime>) => {
   createEffect(() => {
     upsertAnimeWatched(props.updatedValues)
   })
